@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="calibration_package" type="project_laser" name="project_laser" output="screen"/>
+</launch>

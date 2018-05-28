@@ -1,0 +1,6 @@
+Development of an extrinsic calibration package of a monocular camera to a 2D laser.
+Uses a rosbag file to subscribe to /camera/rgb/image_color and /scan.
+The bag contains laser scan and and corresponding checkerborad images.
+line.cpp extracts laser points on the calibration plane using RANSAC.
+pose.cpp uses opencv to find the checkerboard pose.
+transform.cpp uses the above to find an optimal transform between the camera and the laser.

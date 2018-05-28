@@ -1,0 +1,8 @@
+<launch>
+  <param name="/use_sim_time" value="true"/>
+
+  <node pkg="rosbag" type="play" name="play" required="true" 
+    args="/home/ankur/Desktop/2017-09-14-19-12-35.bag --delay=3 --loop --clock -s 2 -u 18"/>
+
+  <node pkg="rviz" type="rviz" name="rviz" />
+</launch>

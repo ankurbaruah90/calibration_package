@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node pkg="calibration_package" type="line_node" name="line_node" output="screen"/>
+  <node pkg="calibration_package" type="pose" name="pose" output="screen"/>
+  <node pkg="calibration_package" type="transform" name="transform" output="screen" required="true"/>
+
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+
+        <remap from="cloud_in" to="calibration_plane_sensor"/>
+        <remap from="scan" to="calibration_plane_laser"/>
+	
+	<param name="target_frame" value="base_link"/>
+	<param name="transform_tolerance" value="0.01"/>
+	<param name="min_height" value="0.0"/>
+	<param name="max_height" value="1.0"/>
+       
+	<param name="angle_min" value="-1.57"/>
+	<param name="angle_max" value="4.71"/>
+	<param name="angle_increment" value="0.0087"/>
+	<param name="scan_time" value="0.3333"/>
+	<param name="range_min" value="0.2"/>
+	<param name="range_max" value="40.0"/>
+	<param name="use_inf" value="false"/>
+ 
+	<param name="concurrency_level" value="1"/>
+
+    </node>
+
+</launch>
