@@ -39,14 +39,14 @@ include_directories(
 add_executable(line_node src/line.cpp)
 target_link_libraries(line_node ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
-add_executable(transform src/transform.cpp)
-target_link_libraries(transform ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
+#add_executable(transform src/transform.cpp)
+#target_link_libraries(transform ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
 
 add_executable(pose src/pose.cpp)
 target_link_libraries(pose ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
-add_executable(project_laser src/project_laser.cpp)
-target_link_libraries(project_laser ${OpenCV_LIBS} ${catkin_LIBRARIES})
+#add_executable(project_laser src/project_laser.cpp)
+#target_link_libraries(project_laser ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
-add_executable(plot_graph src/plot.cpp)
-target_link_libraries(plot_graph ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
+#add_executable(plot_graph src/plot.cpp)
+#target_link_libraries(plot_graph ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
