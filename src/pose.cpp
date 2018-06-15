@@ -90,11 +90,11 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
         cv::imshow("corners", cv_ptr->image);
         cv::waitKey(1);
 
-        cout << "Top Left     X " << pointBuf[0].x << " Y " << pointBuf[0].y << endl;
-        cout << "Top Right    X " << pointBuf[4].x << " Y " << pointBuf[4].y << endl;
-        cout << "Bottom Left  X " << pointBuf[10].x << " Y " << pointBuf[10].y << endl;
-        cout << "Bottom Right X " << pointBuf[14].x << " Y " << pointBuf[14].y << endl;
-/*
+//        cout << "Top Left     X " << pointBuf[0].x << " Y " << pointBuf[0].y << endl;
+//        cout << "Top Right    X " << pointBuf[4].x << " Y " << pointBuf[4].y << endl;
+//        cout << "Bottom Left  X " << pointBuf[10].x << " Y " << pointBuf[10].y << endl;
+//        cout << "Bottom Right X " << pointBuf[14].x << " Y " << pointBuf[14].y << endl;
+
         // to point2d
         vector<Point2d> pointBuf2d;
         vector<Point3d> boardPoints;
@@ -150,7 +150,6 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
         tf3d.getRotation(tfqt);
         transform.setRotation(tfqt);
         br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "camera", "checker_board"));
-        */
     }
 }
 
