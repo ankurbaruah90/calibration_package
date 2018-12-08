@@ -1,12 +1,5 @@
-The package only extracts data in the format required by RADLOCC package to
-calibrate a camera to a laser scanner. 
-
-Uncomment the other executables for the calibration code.
-
-Development of an extrinsic calibration package of a monocular camera to a 2D laser.
+A ROS based extrinsic calibration tool for a monocular camera to a 2D laser.
 Subscribe to /camera/rgb/image_color and /scan.
 The topic /scan should contain the laser scans and /camera/rgb/image_color should contain the corresponding checkerborad images.
 line.cpp extracts laser points dropping on the calibration plane using RANSAC.
 pose.cpp uses opencv to find the checkerboard pose.
-Set the macro WRITE to 1 in order to save the data required by the RADLOCC package.
-data.txt will have the laser data and val.txt will have the timestamps of the checker board images.
