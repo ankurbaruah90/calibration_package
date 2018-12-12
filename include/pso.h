@@ -6,9 +6,9 @@
 #include <sys/time.h>
 
 #define V_MAX 2.0                                                               // max particle velocity
-#define w 0.729                                                                 // inertia parameter w
-#define c1 1.494                                                                // PSO parameter c1
-#define c2 1.494                                                                // PSO parameter c2
+#define INRETIA 0.729                                                           // inertia parameter w
+#define c_1 1.494                                                               // PSO parameter c1
+#define c_2 1.494                                                               // PSO parameter c2
 #define SPAN 50                                                                 // Span of the swarm
 #define SWARM_SIZE 20                                                           // Size of the swarm
 #define DIM 2                                                                   // parameters
@@ -109,7 +109,7 @@ void PSO::updateVelocityAndPosition()
             random1 = gsl_rng_uniform(r);
             random2 = gsl_rng_uniform(r);
 
-            variableVelocity = w * velocity[i][j] + c1 * (random1 * (localBestPosition[i][j] - currentPosition[i][j])) + c2 * (random2 * (globalBestPosition[i][j] - currentPosition[i][j]));
+            variableVelocity = INRETIA * velocity[i][j] + c_1 * (random1 * (localBestPosition[i][j] - currentPosition[i][j])) + c_2 * (random2 * (globalBestPosition[i][j] - currentPosition[i][j]));
             if (variableVelocity < 0)
                 velocity[i][j] = fmax(variableVelocity, (-1.0 * V_MAX));
             else

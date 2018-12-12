@@ -8,6 +8,7 @@
 #include <image_geometry/pinhole_camera_model.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 
 #define WRITE 0
 
@@ -55,10 +56,25 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
         return;
     }
 
-//    cv::Mat img = cv_ptr->image;
-    cvtColor(cv_ptr->image, cv_ptr->image, CV_RGB2GRAY);
-    cv::imshow("image_raw", cv_ptr->image);
-    cv::waitKey(1);
+    ///--------------------------------------------------------------------------
+    static tf2_ros::StaticTransformBroadcaster static_broadcaster;
+    geometry_msgs::TransformStamped static_transformStamped;
+
+    static_transformStamped.header.stamp = ros::Time::now();
+    static_transformStamped.header.frame_id = "camera";
+    static_transformStamped.child_frame_id = "camera_optical_centre";
+    static_transformStamped.transform.translation.x = 0;
+    static_transformStamped.transform.translation.y = 0;
+    static_transformStamped.transform.translation.z = 0;
+
+    tf2::Quaternion quat;
+    quat.setRPY(-1.571, -0.000, -1.571);
+    static_transformStamped.transform.rotation.x = quat.x();
+    static_transformStamped.transform.rotation.y = quat.y();
+    static_transformStamped.transform.rotation.z = quat.z();
+    static_transformStamped.transform.rotation.w = quat.w();
+    static_broadcaster.sendTransform(static_transformStamped);
+    ///----------------------------------------------------------------------------
 
 #if WRITE
     std::ofstream timeLog;
@@ -72,15 +88,14 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
 #endif
 
     vector<Point2f> pointBuf;
+    cvtColor(cv_ptr->image, cv_ptr->image, CV_RGB2GRAY);
     bool found = findChessboardCorners(cv_ptr->image, Size(8,6), pointBuf, CV_CALIB_CB_ADAPTIVE_THRESH);
-    if (found){
+    if (found)
+    {
         cornerSubPix(cv_ptr->image, pointBuf, Size(11, 11), Size(-1, -1),
             TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 
         drawChessboardCorners(cv_ptr->image, Size(8,6), Mat(pointBuf), found);
-
-        cv::imshow("corners", cv_ptr->image);
-        cv::waitKey(1);
 
 //        cout << "Top Left     X " << pointBuf[0].x << " Y " << pointBuf[0].y << endl;
 //        cout << "Top Right    X " << pointBuf[4].x << " Y " << pointBuf[4].y << endl;
@@ -126,7 +141,6 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
 //        cout << "Translation Vector " << endl << tvec << endl;
 
         imshow("image", cv_ptr->image);
-        waitKey(1);
         pub.publish(cv_ptr->toImageMsg());
 
         static tf::TransformBroadcaster br;
@@ -135,14 +149,17 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
 
         tf::Matrix3x3 tf3d;
         tf3d.setValue(rmat.at<double>(0,0), rmat.at<double>(0,1), rmat.at<double>(0,2),
-              rmat.at<double>(1,0), rmat.at<double>(1,1), rmat.at<double>(1,2),
-              rmat.at<double>(2,0), rmat.at<double>(2,1), rmat.at<double>(2,2));
+                      rmat.at<double>(1,0), rmat.at<double>(1,1), rmat.at<double>(1,2),
+                      rmat.at<double>(2,0), rmat.at<double>(2,1), rmat.at<double>(2,2));
 
         tf::Quaternion tfqt;
         tf3d.getRotation(tfqt);
         transform.setRotation(tfqt);
-        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "camera", "checker_board"));
+        br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "camera_optical_centre", "checker_board"));
     }
+    else
+        imshow("image", cv_ptr->image);
+    waitKey(1);
 }
 
 int main(int argc, char *argv[])

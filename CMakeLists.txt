@@ -36,9 +36,9 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(line_node src/line.cpp)
 target_link_libraries(line_node ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
-add_executable(pose src/pose.cpp)
-target_link_libraries(pose ${OpenCV_LIBS} ${catkin_LIBRARIES})
+add_executable(checkerboard_pose src/pose.cpp)
+target_link_libraries(checkerboard_pose ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
-add_executable(transform src/transform.cpp)
-target_link_libraries(transform ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
+add_executable(calibrate src/transform.cpp)
+target_link_libraries(calibrate ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
 
