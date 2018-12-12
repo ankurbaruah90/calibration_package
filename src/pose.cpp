@@ -3,17 +3,9 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
-#include <image_geometry/pinhole_camera_model.h>
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/core/core.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/video/tracking.hpp"
 #include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include "opencv2/highgui/highgui.hpp"
+#include <image_geometry/pinhole_camera_model.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
 
@@ -50,9 +42,8 @@ static void meshgridTest(const cv::Range &xgv, const cv::Range &ygv,
 
 void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
 {
-    std::ofstream timeLog;
-    msg->header.stamp = ros::Time(0);
     std_msgs::Header h = msg->header;
+    msg->header.stamp = ros::Time(0);
     cv_bridge::CvImagePtr cv_ptr;
     try
     {
@@ -70,6 +61,7 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
     cv::waitKey(1);
 
 #if WRITE
+    std::ofstream timeLog;
     if(!(number++ % 10))
     {
         timeLog.open("/home/ankur/Desktop/NewImage/val.txt", std::ofstream::out | std::ofstream::app);
@@ -80,12 +72,12 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
 #endif
 
     vector<Point2f> pointBuf;
-    bool found = findChessboardCorners(cv_ptr->image, Size(5,3), pointBuf, CV_CALIB_CB_ADAPTIVE_THRESH);
+    bool found = findChessboardCorners(cv_ptr->image, Size(8,6), pointBuf, CV_CALIB_CB_ADAPTIVE_THRESH);
     if (found){
         cornerSubPix(cv_ptr->image, pointBuf, Size(11, 11), Size(-1, -1),
             TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 
-        drawChessboardCorners(cv_ptr->image, Size(5,3), Mat(pointBuf), found);
+        drawChessboardCorners(cv_ptr->image, Size(8,6), Mat(pointBuf), found);
 
         cv::imshow("corners", cv_ptr->image);
         cv::waitKey(1);
@@ -155,11 +147,11 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
 
 int main(int argc, char *argv[])
 {
-    ros::init(argc, argv, "image_node");
+    ros::init(argc, argv, "pose");
     ROS_INFO("Started Node");
     ros::NodeHandle nh;
     ros::Rate rate(20);
-    ros::Subscriber imageSubscriber = nh.subscribe("/camera/color/image_raw", 1, imageCallBack);
+    ros::Subscriber imageSubscriber = nh.subscribe("/camera_front/color/image_raw", 1, imageCallBack);
     pub = nh.advertise < sensor_msgs::Image > ("/checker_matrix", 1);
 
     while(ros::ok()){
