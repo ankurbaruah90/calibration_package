@@ -126,7 +126,7 @@ void readScanCallBack(const sensor_msgs::LaserScanPtr &laserscan)
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "line_node");
-    ROS_INFO("Started Node");
+    ROS_INFO("Started Laser Line Extraction Node");
 
     ros::NodeHandle node;
     ros::Subscriber laserScanSubscriber = node.subscribe("/r2000_driver_node/scan", 1, readScanCallBack);

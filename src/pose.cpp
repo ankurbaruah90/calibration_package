@@ -15,12 +15,6 @@
 using namespace std;
 using namespace cv;
 
-/*
-    1. Laser scan frame
-    2. Geometry sanity
-    3. Check optimization, add orthonormality constraint
-*/
-
 int number = 0;
 ros::Publisher pub;
 static void meshgrid(const cv::Mat &xgv, const cv::Mat &ygv,
@@ -137,8 +131,8 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
         line(cv_ptr->image, corner, imagePoints[1], (0,255,0), 5);
         line(cv_ptr->image, corner, imagePoints[2], (0,0,255), 5);
 
-//        cout << "Rotation Vector " << endl << rmat << endl;
-//        cout << "Translation Vector " << endl << tvec << endl;
+        cout << "Rotation Vector " << endl << rmat << endl;
+        cout << "Translation Vector " << endl << tvec << endl;
 
         imshow("image", cv_ptr->image);
         pub.publish(cv_ptr->toImageMsg());
@@ -165,7 +159,7 @@ void imageCallBack(const sensor_msgs::ImageConstPtr &msg)
 int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "pose");
-    ROS_INFO("Started Node");
+    ROS_INFO("Started Checker Board Pose Calculation Node");
     ros::NodeHandle nh;
     ros::Rate rate(20);
     ros::Subscriber imageSubscriber = nh.subscribe("/camera_front/color/image_raw", 1, imageCallBack);

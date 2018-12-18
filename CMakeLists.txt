@@ -40,5 +40,8 @@ add_executable(checkerboard_pose src/pose.cpp)
 target_link_libraries(checkerboard_pose ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
 add_executable(calibrate src/transform.cpp)
-target_link_libraries(calibrate ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
+target_link_libraries(calibrate ${OpenCV_LIBS} ${catkin_LIBRARIES})
+
+add_executable(optimize src/pso.cpp)
+target_link_libraries(optimize ${OpenCV_LIBS} ${catkin_LIBRARIES} gsl gslcblas)
 
