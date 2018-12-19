@@ -1,5 +1,25 @@
 A ROS based extrinsic calibration tool for a monocular camera to a 2D laser.
-Subscribe to /camera/rgb/image_color and /scan.
-The topic /scan should contain the laser scans and /camera/rgb/image_color should contain the corresponding checkerborad images.
-line.cpp extracts laser points dropping on the calibration plane using RANSAC.
-pose.cpp uses opencv to find the checkerboard pose.
+
+The package uses a checker board to estimate the equation of the checker board 
+plane in camera frame. From the available information on the location of the 
+checker board w.r.t. laser, it estimates the laser points falling on the checker 
+board. These points are transformed to camera frame for further processing.
+
+Using a search optimization it makes a random estimate of the transformation of 
+camera w.r.t. laser. If the generated transformation estimate if optimal, then 
+the laser points on the checker board in the camera frame should satisfy the 
+plane equation.
+
+The search optimization iteratively generates transformation estimates until a 
+solution is found. It currently uses PSO, the code to which can be found in the 
+repository https://github.com/ankurbaruah90/pso.
+
+Process Flow:
+1. pso.cpp generates random solutions and publishes them to transform.cpp
+2. transform.cpp subscribes to line.cpp and pose.cpp for estimates of checker
+   board plane equation and laser points in the checker board.
+3. transform.cpp returns a score based on the degree to which the laser points 
+   satisfy the plane equation.
+4. pso.cpp repeats this process until the spread of the swarm of particles 
+   fall within a set threshold and results the optimal transform between the 
+   camera and the laser.

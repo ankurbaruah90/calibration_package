@@ -3,6 +3,7 @@
 #include <opencv/cv.h>
 #include <pcl_ros/point_cloud.h>
 #include "tf/transform_listener.h"
+#include <calibration_package/Particle.h>
 
 using namespace std;
 using namespace cv;
@@ -88,6 +89,11 @@ void laserscanCB(const pcl::PointCloud <pcl::PointXYZ>::Ptr plane_points)
     }
 }
 
+void particleCB(const calibration_package::ParticlePtr msg)
+{
+    for (int i = 0; i < msg->param.size(); i++)
+        cout << msg->param[i] << endl;
+}
 
 int main(int argc, char **argv)
 {
@@ -96,6 +102,7 @@ int main(int argc, char **argv)
     ros::NodeHandle n1;
     ros::Rate rate(20);
     ros::Subscriber laserScanSubscriber = n1.subscribe("/calibration_plane", 1, laserscanCB);
+    ros::Subscriber subscribeParticle = n1.subscribe("/particles", 1, particleCB);
 
     while(ros::ok())
     {
