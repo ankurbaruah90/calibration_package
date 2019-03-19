@@ -1,12 +1,31 @@
 #include <iostream>
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <opencv/cv.h>
+#include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
 #include <pcl_ros/point_cloud.h>
 #include "tf/transform_listener.h"
 #include <calibration_package/Particle.h>
 
+///----------------------------------
+
+//#include <fstream>
+//#include <string.h>
+
+//struct tm tstruct;
+//char plot[100];
+//time_t now;
+
+///----------------------------------
+
 using namespace std;
 using namespace cv;
+
+double cost = FLT_MAX;
+ros::NodeHandle *n_;
+ros::Publisher publish_score;
+double estimated_x = 0, estimated_y = 0, estimated_z = 0;
 
 void laserscanCB(const pcl::PointCloud <pcl::PointXYZ>::Ptr plane_points)
 {
@@ -68,41 +87,82 @@ void laserscanCB(const pcl::PointCloud <pcl::PointXYZ>::Ptr plane_points)
 
 
         ///-------------------------------------------------------///
+        ///------Transform to camera frame using the random-------///
+        ///---------------generated particle values---------------///
+        /// ------------------------and---------------------------///
         ///----converting pcl::pointxyz to vector <vector3>-------///
         /// ------------------------------------------------------///
-
-        vector <tf::Vector3> line_points;
-        BOOST_FOREACH (const pcl::PointXYZ& pt, plane_points->points){
-            tf::Vector3 temp(pt.x, pt.y, pt.z);;
-//                    ROS_INFO("Points (%f, %f, %f) - (%f, %f, %f)", normal.x(), normal.y(), normal.z(), temp.x(), temp.y(), temp.z());
-            line_points.push_back(temp);
-        }
-
         ///-------------------------------------------------------///
         ///----Minimizing the cost function in which the----------///
         ///----laser points satisfy the plane equation------------///
         /// ------------------------------------------------------///
 
-//        std::map <vector <tf::Vector3>, tf::Vector3> pointPoseMap;
-//        pointPoseMap.insert(std::pair<vector <tf::Vector3>, tf::Vector3>(line_points, normal));
-//        line_points.clear();
+        BOOST_FOREACH (const pcl::PointXYZ& pt, plane_points->points){
+            tf::Vector3 temp(pt.x, pt.y, pt.z);
+            cost += fabs(plane_eq.at<float>(0,0)*(temp.x() + estimated_x) +
+                    plane_eq.at<float>(1,0)*(temp.y() + estimated_y) +
+                    plane_eq.at<float>(2,0)*(temp.z() + estimated_z) +
+                    plane_eq.at<float>(3,0));
+        }
+        cout << "Cost " << cost << endl;
     }
 }
 
-void particleCB(const calibration_package::ParticlePtr msg)
+void particleCB(const calibration_package::ParticlePtr &msg)
 {
+    ROS_INFO("Received particles!!");
+
     for (int i = 0; i < msg->param.size(); i++)
         cout << msg->param[i] << endl;
+
+    estimated_x = msg->param[0];
+    estimated_y = msg->param[1];
+    estimated_z = msg->param[2];
+
+    std::string path = ros::package::getPath("calibration_package");
+    system((path + "/launchBag.sh &").c_str());
+
+
+    ///------------------------------------------
+
+//    std::ofstream dataLog;
+//    dataLog.open(plot, std::ofstream::out | std::ofstream::app);
+//    dataLog << x << ", " << y << ", " << cost << "\n";
+//    dataLog.close();
+
+    ///------------------------------------------
 }
+
+void bagCompletionCB(const std_msgs::BoolPtr msg)
+{
+    std_msgs::Float32 error_score;
+    if(msg->data)
+    {
+        error_score.data = cost;
+        publish_score.publish(error_score);
+    }
+}
+
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "calibrate_node");
     ROS_INFO("Started calibration node");
-    ros::NodeHandle n1;
-    ros::Rate rate(20);
-    ros::Subscriber laserScanSubscriber = n1.subscribe("/calibration_plane", 1, laserscanCB);
-    ros::Subscriber subscribeParticle = n1.subscribe("/particles", 1, particleCB);
+    n_ = new ros::NodeHandle;
+    ros::Rate rate(1);
+    publish_score = n_->advertise<std_msgs::Float32>("score", 1);
+    ros::Subscriber laserScanSubscriber = n_->subscribe("/calibration_plane", 1, laserscanCB);
+    ros::Subscriber subscribeParticle = n_->subscribe("/particle_parameters", 1, particleCB);
+    ros::Subscriber subscribeBagCompletionFlag = n_->subscribe("/bagdone", 1, bagCompletionCB);
+
+    ///------------------------------------------
+
+//    now = time(0);
+//    tstruct = *localtime(&now);
+//    strftime(plot, sizeof(plot), "/home/ankur/Desktop/PSO-%Y-%m-%d-%H-%M-%S", &tstruct);
+//    strcat(plot, ".csv");
+
+    ///------------------------------------------
 
     while(ros::ok())
     {
@@ -110,5 +170,6 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
+    delete n_;
     return 0;
 }

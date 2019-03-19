@@ -11,7 +11,7 @@
 #define c_2 1.494                                                               // PSO parameter c2
 #define SPAN 50                                                                 // Span of the swarm
 #define SWARM_SIZE 20                                                           // Size of the swarm
-#define DIM 2                                                                   // parameters
+#define DIM 3                                                                   // parameters
 #define ITERATION 10                                                            // number of iterations
 
 class PSO

@@ -2,8 +2,9 @@
 
 <launch>
   <node pkg="calibration_package" type="line_node" name="line_node" output="screen"/>
-  <node pkg="calibration_package" type="pose" name="pose" output="screen"/>
-  <node pkg="calibration_package" type="transform" name="transform" output="screen" required="true"/>
+  <node pkg="calibration_package" type="checkerboard_pose" name="checkerboard_pose" output="screen"/>
+  <node pkg="calibration_package" type="calibrate" name="calibrate" output="screen"/>
+  <node pkg="calibration_package" type="optimize" name="optimize" output="screen" required="true"/>
 
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
 

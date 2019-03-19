@@ -22,6 +22,7 @@ float PSO::getScore(std::vector<float> values)
     for (std::vector <float>::iterator it = values.begin(); it != values.end(); ++it)
         particle_array.param.push_back(*it);
     publish_particles.publish(particle_array);
+    ROS_INFO("Published particles!");
 
     /// -----
     /// -----Generate particles
@@ -31,10 +32,18 @@ float PSO::getScore(std::vector<float> values)
     /// -----Wait for message (score) in getScore funciton
     /// -----
 
-    std_msgs::Float32::ConstPtr msg = ros::topic::waitForMessage <std_msgs::Float32> ("/Score", *n_);
-    float cost = abs(msg->data);
+//    boost::shared_ptr<std_msgs::Float32 const> msg(new std_msgs::Float32);
+//    msg = ros::topic::waitForMessage <std_msgs::Float32> ("/score", *n_, ros::Duration(10.0));
 
-    return cost;
+    boost::shared_ptr<std_msgs::Float32 const> msg(ros::topic::waitForMessage <std_msgs::Float32> ("/score", *n_, ros::Duration(10.0)));
+
+    if (msg == NULL)
+        return FLT_MAX;
+    else
+    {
+        std::cout << "Error " << msg->data << std::endl;
+        return msg->data;
+    }
 }
 
 int main(int argc, char **argv)
@@ -47,7 +56,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "optimize_node");
     ROS_INFO("Started Search Optimization Node");
     n_ = new ros::NodeHandle;
-    publish_particles = n_->advertise<calibration_package::Particle>("particles", 1, true);
+    publish_particles = n_->advertise<calibration_package::Particle>("particle_parameters", 1);
 
     PSO search;
     std::vector <float> parameters;

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <ros/ros.h>
-#include <ros/package.h>
 #include <sensor_msgs/LaserScan.h>
 #include <laser_geometry/laser_geometry.h>
 #include "opencv2/highgui/highgui.hpp"
@@ -115,7 +114,7 @@ void readScanCallBack(const sensor_msgs::LaserScanPtr &laserscan)
     ROS_INFO("Cloud: width = %d, height = %d\n", transformed_cloud->width, transformed_cloud->height);
     ROS_INFO("Final: width = %d, height = %d\n", final_points->width, final_points->height);
     BOOST_FOREACH (const pcl::PointXYZ& pt, final_points->points)
-            ROS_INFO("\t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
+            ROS_INFO("Line Points \t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
 
     //laser data in sensor_msgs point cloud 2
     sensor_msgs::PointCloud2 final_points_laser;
@@ -132,9 +131,6 @@ int main(int argc, char** argv)
     ros::Subscriber laserScanSubscriber = node.subscribe("/r2000_driver_node/scan", 1, readScanCallBack);
     pub = node.advertise < pcl::PointCloud <pcl::PointXYZ> > ("calibration_plane", 1);
     pub_sensor = node.advertise < sensor_msgs::PointCloud2 > ("calibration_plane_sensor", 1);
-
-    std::string path = ros::package::getPath("calibration_package");
-//    system((path + "/launchBag.sh &").c_str());
 
     ros::Rate rate(20.0);
     while (node.ok()){
